@@ -1,0 +1,208 @@
+<<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Job Portal - Find your next role</title>
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+            rel="stylesheet">
+    </head>
+
+    <body>
+
+        <header class="topbar">
+            <div class="logo" onclick="location.reload()">
+                <div class="logo-icon">◥</div>
+                <span>Job Portal</span>
+            </div>
+
+            <nav class="nav">
+                <span class="active">Find Jobs</span>
+                <span onclick="openSec('Companies')">Companies</span>
+                <span onclick="openSec('Messages')">Messages <sup>2</sup></span>
+                <span onclick="openSec('Salary')">Salary Guide</span>
+                <span onclick="openSec('Discover')">Discover</span>
+                <span onclick="openApplications()">
+                    My Applications <b id="appCount">0</b>
+                </span>
+            </nav>
+
+            <div class="right">
+                <div class="notif" onclick="openSec('Notifications')">
+                    🔔
+                    <div class="badge">3</div>
+                </div>
+                <div class="avatar" onclick="openAuth()">
+                    <img src="https://i.pravatar.cc/100" id="avatarImg" alt="avatar">
+                </div>
+            </div>
+        </header>
+
+        <main class="wrap">
+            <section class="hero">
+                <h1>Find your next role</h1>
+                <p>
+                    <span id="jobCount">20</span> jobs now hiring — vetted roles from
+                    leading companies
+                </p>
+            </section>
+
+            <section class="searchBox">
+                <span>🔍</span>
+                <input id="searchInput" placeholder="Search jobs, companies, keywords..." oninput="doSearch()">
+                <div class="filters">
+                    <div class="f-btn" onclick="toggleDrop('locDrop')">
+                        📍 <span id="locLabel">Location</span> ▾
+                        <div id="locDrop" class="dropdown"></div>
+                    </div>
+                    <div class="f-btn" onclick="toggleDrop('remoteDrop')">
+                        🏠 <span id="remoteLabel">Remote</span> ▾
+                        <div id="remoteDrop" class="dropdown"></div>
+                    </div>
+                    <div class="f-btn" onclick="toggleDrop('salDrop')">
+                        💲 <span id="salLabel">Salary Range</span> ▾
+                        <div id="salDrop" class="dropdown"></div>
+                    </div>
+                </div>
+                <button class="searchBtn" onclick="doSearch()">Search</button>
+            </section>
+
+            <div class="popular" id="popular"></div>
+
+            <div class="sectionHead">
+                <h3>Featured Jobs - 20 Jobs</h3>
+                <span class="link" onclick="resetF()">View all jobs →</span>
+            </div>
+
+            <div class="grid" id="jobGrid"></div>
+
+            <section class="reco">
+                <div class="recoHead">
+                    <div>
+                        <h3>Recommended for you</h3>
+                        <p>Tailored to your profile and preferences</p>
+                    </div>
+                    <span class="link" onclick="toggleReco()">
+                        See all recommendations →
+                    </span>
+                </div>
+                <div id="recoList"></div>
+                <div id="recoAll" class="hidden mt-10"></div>
+            </section>
+
+            <section id="myApplications" class="reco hidden">
+                <div class="recoHead">
+                    <div>
+                        <h3>My Applications</h3>
+                    </div>
+                    <span class="link" id="hideAppBtn">Hide →</span>
+                </div>
+                <div id="appList"></div>
+            </section>
+        </main>
+
+        <div class="modal" id="detailModal">
+            <div class="modalBox" id="detailBox"></div>
+        </div>
+
+        <div class="modal" id="applyModal">
+            <div class="modalBox">
+                <span class="close" onclick="closeM('applyModal')">✕</span>
+                <h2>Apply for <span id="applyRole"></span></h2>
+                <p class="subtext">Professional Form - PDF Only Resume</p>
+
+                <input class="input" id="fName" type="text" placeholder="Full Name" required>
+                <input class="input" id="fEmail" type="email" placeholder="Email" required>
+                <input class="input" id="fPhone"  type="number" placeholder="Phone" required>
+                <input class="input" id="fLinkedIn" type="url" placeholder="LinkedIn / Portfolio URL" required>
+                <input class="input" id="fCCTC" type="number" placeholder="Current CTC" required>
+                <input class="input" id="fECTC" type="number" placeholder="Expected CTC" required>
+
+                <label class="label">Upload Resume/CV (Only PDF) *</label>
+                <input class="input" type="file" id="fResume" accept=".pdf" onchange="validatePDF(this)" required>
+                <p id="pdfName" class="pdf-name"></p>
+
+                <textarea class="input" id="fCover" rows="4" type="text" placeholder="Cover Letter - Why should we hire you?" required></textarea>
+
+                <button class="btn btn-apply" onclick="submitApp()">
+                    Submit Application
+                </button>
+                <p id="formError" class="error"></p>
+            </div>
+        </div>
+
+        <div class="modal" id="successModal">
+            <div class="modalBox success-box">
+                <div class="success-icon">🎉</div>
+                <h2>Application Successful!</h2>
+                <p>Your application for <b id="successRole"></b> saved</p>
+                <div id="successDetails" class="success-details"></div>
+
+                <button class="btn btn-apply" onclick="closeM('successModal'); resetF()">
+                    Return to Dashboard
+                </button>
+                <button class="btn btn-secondary" onclick="editLast()">
+                    Edit Application
+                </button>
+                <button class="btn btn-link" onclick="closeM('successModal'); openApplications()">
+                    View My Applications
+                </button>
+            </div>
+        </div>
+
+        <div class="modal" id="authModal">
+            <div class="modalBox auth-box">
+                <span class="close" onclick="closeM('authModal')">✕</span>
+                <h2 id="authTitle">Welcome back</h2>
+                <p class="subtext">Login to apply and save jobs</p>
+
+                <div class="oauth">
+                    <button class="btn btn-google" onclick="oauth('Google')">
+                        Continue with Google
+                    </button>
+                    <button class="btn btn-facebook" onclick="oauth('Facebook')">
+                        Continue with Facebook
+                    </button>
+                    <button class="btn btn-github" onclick="oauth('GitHub')">
+                        Continue with GitHub
+                    </button>
+                </div>
+
+                <div class="divider">or</div>
+
+                <input class="input" id="email" type="email" placeholder="Email" required>
+                <input class="input" id="password" type="password" placeholder="Password" required>
+
+                <button class="btn btn-primary" onclick="emailLogin()">
+                    Login with Email
+                </button>
+
+                <p class="switch-text">
+                    Don't have account?
+                    <span class="link" onclick="switchAuth()">Create account</span>
+                </p>
+
+                <div id="createFields" class="hidden">
+                    <input class="input" id="cName" type="text" placeholder="Full Name" required>
+                    <input class="input" id="cEmail" type="email" placeholder="Email" required>
+                    <input class="input" id="cPass" type="password" placeholder="Create Password" required>
+                    <input class="input" id="cConfirmPass" type="password" placeholder="Confirm Password" required>
+                    <p id="cPassError" class="error"></p>
+                    <button class="btn btn-primary" onclick="createAccount()">
+                        Create Account
+                    </button>
+                    <p class="switch-text">
+                        Already have account?
+                        <span class="link" onclick="switchAuth()">Login</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+
+    </html>
